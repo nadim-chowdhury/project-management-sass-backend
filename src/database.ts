@@ -10,7 +10,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       password: 'your_password',
       database: 'your_database_name',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // Only for development, should be false in production
+      synchronize: true, 
     }),
   ],
 })

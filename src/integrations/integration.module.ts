@@ -8,14 +8,14 @@ import { DiscordService } from './discord.service';
 })
 export class IntegrationModule {}
 
-import { Module } from '@nestjs/common';
-import { GoogleMeetService } from './google-meet.service';
-import { ZoomService } from './zoom.service';
-import { AwsS3Service } from './aws-s3.service';
-import { GoogleDriveService } from './google-drive.service';
+// import { Module } from '@nestjs/common';
+// import { GoogleMeetService } from './google-meet.service';
+// import { ZoomService } from './zoom.service';
+// import { AwsS3Service } from './aws-s3.service';
+// import { GoogleDriveService } from './google-drive.service';
 
-@Module({
-  providers: [GoogleMeetService, ZoomService, AwsS3Service, GoogleDriveService],
-  exports: [GoogleMeetService, ZoomService, AwsS3Service, GoogleDriveService],
-})
-export class IntegrationModule {}
+// @Module({
+//   providers: [GoogleMeetService, ZoomService, AwsS3Service, GoogleDriveService],
+//   exports: [GoogleMeetService, ZoomService, AwsS3Service, GoogleDriveService],
+// })
+// export class IntegrationModule {}
