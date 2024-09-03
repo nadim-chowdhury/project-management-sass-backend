@@ -1,22 +1,25 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Project } from './project.entity';
+import { ProjectEntity } from './project.entity';
 
 @Injectable()
 export class ProjectService {
   constructor(
-    @InjectRepository(Project)
-    private projectRepository: Repository<Project>,
+    @InjectRepository(ProjectEntity)
+    private projectRepository: Repository<ProjectEntity>,
   ) {}
 
-  async findAll(): Promise<Project[]> {
-    return await this.projectRepository.find({ relations: ['tasks'] });
+  async findAll(): Promise<ProjectEntity[]> {
+    return await this.projectRepository.find({
+      relations: ['tasks', 'owner'], // Include 'owner' relation if needed
+    });
   }
 
-  async findById(id: number): Promise<Project> {
-    const project = await this.projectRepository.findOne(id, {
-      relations: ['tasks'],
+  async findById(id: number): Promise<ProjectEntity> {
+    const project = await this.projectRepository.findOne({
+      where: { id },
+      relations: ['tasks', 'owner'], // Include 'owner' relation if needed
     });
     if (!project) {
       throw new NotFoundException(`Project with id ${id} not found`);
@@ -24,17 +27,23 @@ export class ProjectService {
     return project;
   }
 
-  async create(projectData: Partial<Project>): Promise<Project> {
+  async create(projectData: Partial<ProjectEntity>): Promise<ProjectEntity> {
     const newProject = this.projectRepository.create(projectData);
     return await this.projectRepository.save(newProject);
   }
 
-  async update(id: number, projectData: Partial<Project>): Promise<Project> {
+  async update(
+    id: number,
+    projectData: Partial<ProjectEntity>,
+  ): Promise<ProjectEntity> {
     await this.projectRepository.update(id, projectData);
     return this.findById(id);
   }
 
   async delete(id: number): Promise<void> {
-    await this.projectRepository.delete(id);
+    const result = await this.projectRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Project with id ${id} not found`);
+    }
   }
 }

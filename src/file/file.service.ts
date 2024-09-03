@@ -9,14 +9,14 @@ export class FileService {
     private readonly googleDriveService: GoogleDriveService,
   ) {}
 
-  async uploadToAwsS3(
-    file: Express.Multer.File,
-    bucketName: string,
-  ): Promise<string> {
-    return this.awsS3Service.uploadFile(file, bucketName);
-  }
+  // async uploadToAwsS3(
+  //   file: Express.Multer.File,
+  //   bucketName: string,
+  // ): Promise<string> {
+  //   return this.awsS3Service.uploadFile(file, bucketName);
+  // }
 
-  async uploadToGoogleDrive(file: Express.Multer.File): Promise<string> {
-    return this.googleDriveService.uploadFile(file);
-  }
+  // async uploadToGoogleDrive(file: Express.Multer.File): Promise<string> {
+  //   return this.googleDriveService.uploadFile(file);
+  // }
 }

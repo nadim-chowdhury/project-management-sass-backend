@@ -40,7 +40,9 @@ export class ZoomService {
       exp: new Date().getTime() + 5000,
     };
 
-    const token = jwt.sign(payload, apiSecret);
-    return token;
+    // const token = jwt.sign(payload, apiSecret);
+    // return token;
+
+    return null;
   }
 }

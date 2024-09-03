@@ -1,18 +1,3 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Task } from '../tasks/task.entity';
-
-@Entity()
-export class Project {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  name: string;
-
-  @OneToMany(() => Task, (task) => task.project)
-  tasks: Task[];
-}
-
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -21,10 +6,11 @@ import {
   OneToMany,
 } from 'typeorm';
 import { UserEntity } from '../users/user.entity';
-import { TaskEntity } from '../tasks/task.entity';
+import { Task } from '../tasks/task.entity';
 
 @Entity('projects')
 export class ProjectEntity {
+  // This is the single entity to represent projects
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -34,6 +20,6 @@ export class ProjectEntity {
   @ManyToOne(() => UserEntity, (user) => user.ownedProjects)
   owner: UserEntity;
 
-  @OneToMany(() => TaskEntity, (task) => task.project)
-  tasks: TaskEntity[];
+  @OneToMany(() => Task, (task) => task.project)
+  tasks: Task[];
 }

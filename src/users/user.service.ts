@@ -1,42 +1,53 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { UserEntity } from './user.entity'; // Assuming your entity is named UserEntity
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
+import { CreateUserDto } from './dto/create-user.dto';
+import { validate } from 'class-validator';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async register(
-    username: string,
-    password: string,
-    role: string,
-  ): Promise<User> {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = this.usersRepository.create({
-      username,
+  // Register a new user
+  async register(createUserDto: CreateUserDto): Promise<UserEntity> {
+    const errors = await validate(createUserDto);
+    if (errors.length > 0) {
+      throw new BadRequestException('Validation failed');
+    }
+
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const newUser = this.userRepository.create({
+      email: createUserDto.email,
       password: hashedPassword,
-      role,
+      role: createUserDto.role,
     });
-    return await this.usersRepository.save(newUser);
+
+    return await this.userRepository.save(newUser);
   }
 
+  // Login a user and return JWT token
   async login(
-    username: string,
+    email: string,
     password: string,
   ): Promise<{ accessToken: string }> {
-    const user = await this.usersRepository.findOne({ username });
+    const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { username: user.username, sub: user.id, role: user.role };
+    const payload = { email: user.email, sub: user.id, role: user.role };
     const accessToken = jwt.sign(payload, 'your_jwt_secret_key', {
       expiresIn: '1h',
     });
@@ -44,75 +55,21 @@ export class UserService {
     return { accessToken };
   }
 
-  async findByUsername(username: string): Promise<User | undefined> {
-    return await this.usersRepository.findOne({ username });
-  }
-}
-
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from './user.entity';
-
-@Injectable()
-export class UserService {
-  constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
-  ) {}
-
-  async findByEmail(email: string): Promise<User> {
-    return await this.userRepository.findOne({ where: { email } });
-  }
-
-  async findById(id: number): Promise<User> {
-    return await this.userRepository.findOne(id);
-  }
-
-  async createUser(
-    email: string,
-    password: string,
-    role: string,
-  ): Promise<User> {
-    const newUser = this.userRepository.create({ email, password, role });
-    return await this.userRepository.save(newUser);
-  }
-}
-
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { validate } from 'class-validator';
-import { CreateUserDto } from './dto/create-user.dto';
-
-@Injectable()
-export class UsersService {
-  async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
-    const user = new UserEntity();
-    user.email = createUserDto.email;
-    user.password = createUserDto.password;
-
-    const errors = await validate(user);
-    if (errors.length > 0) {
-      throw new BadRequestException('Validation failed');
-    }
-
-    // Save user to database
-    return await this.userRepository.save(user);
-  }
-}
-
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { UserEntity } from './user.entity';
-
-@Injectable()
-export class UsersService {
-  constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
-  ) {}
-
+  // Find user by email
   async findUserByEmail(email: string): Promise<UserEntity | undefined> {
-    return await this.userRepository.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+    return user;
+  }
+
+  // Find user by ID
+  async findById(id: any): Promise<UserEntity> {
+    const user = await this.userRepository.findOne(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
   }
 }

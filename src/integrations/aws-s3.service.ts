@@ -13,19 +13,20 @@ export class AwsS3Service {
   }
 
   async uploadFile(
-    file: Express.Multer.File,
+    // file: Express.Multer.File,
     bucketName: string,
   ): Promise<string> {
     const params = {
       Bucket: bucketName,
-      Key: file.originalname,
-      Body: file.buffer,
+      // Key: file.originalname,
+      // Body: file.buffer,
       ACL: 'public-read', // or private based on your requirements
     };
 
     try {
-      const data = await this.s3.upload(params).promise();
-      return data.Location; // return the URL of the uploaded file
+      // const data = await this.s3.upload(params).promise();
+      // return data.Location; // return the URL of the uploaded file
+      return null;
     } catch (error) {
       console.error('Error uploading file to AWS S3:', error.message);
       throw error;

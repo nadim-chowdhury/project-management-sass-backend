@@ -1,16 +1,17 @@
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'your_username',
-      password: 'your_password',
-      database: 'your_database_name',
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT, 10) || 5432,
+      username: process.env.DB_USERNAME || 'your_username',
+      password: process.env.DB_PASSWORD || 'your_password',
+      database: process.env.DB_DATABASE || 'your_database_name',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, 
+      synchronize: process.env.TYPEORM_SYNC === 'true', // Set this to `false` in production
     }),
   ],
 })

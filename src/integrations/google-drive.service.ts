@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { Multer } from 'multer';
 
 @Injectable()
 export class GoogleDriveService {
@@ -10,7 +11,7 @@ export class GoogleDriveService {
       'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
 
     const formData = new FormData();
-    formData.append('file', file.buffer, { filename: file.originalname });
+    // formData.append('file', file.buffer, { filename: file.originalname });
 
     try {
       const response = await axios.post(apiUrl, formData, {

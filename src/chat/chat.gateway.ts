@@ -7,6 +7,7 @@ import {
 import { Server } from 'socket.io';
 import { Injectable } from '@nestjs/common';
 import { ChatService } from './chat.service';
+import { MessageEntity } from './message.entity';
 
 @WebSocketGateway()
 @Injectable()
